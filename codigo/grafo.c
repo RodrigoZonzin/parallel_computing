@@ -113,7 +113,7 @@ int lista_adj_vazia(Grafo *g, int v){
 
 }
 
-int* obtem_lista_vertices_adj(Grafo* g, int u) {
+int* obtem_lista_vertices_adj(Grafo* g, int u, int *tam) {
     // Verifica se o grafo está vazio ou se o vértice está fora do limite
     if (g->grafo_vazio || u < 0 || u >= g->tamanho) {
         return NULL;
@@ -141,6 +141,7 @@ int* obtem_lista_vertices_adj(Grafo* g, int u) {
         }
     }
 
+    *tam = count;
     return adjacentes;
 }
 /*

@@ -12,7 +12,7 @@ typedef struct grafo Grafo;
 Grafo* faz_grafo(int); 
 void insere_aresta(Grafo*, int, int, int); 
 int existe_aresta(Grafo*, int, int);
-int* obtem_lista_vertices_adj(Grafo*, int);
+int* obtem_lista_vertices_adj(Grafo*, int, int*);
 void retira_aresta(Grafo*, int, int); 
 void libera_grafo(Grafo*); 
 void imprime_grafo(Grafo*); 
