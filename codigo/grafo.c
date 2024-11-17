@@ -31,6 +31,7 @@ Grafo* faz_grafo(int n){
 void insere_aresta(Grafo *g, int v1, int v2, int peso){
     
     g->matriz[v1][v2] = peso; 
+    g->matriz[v2][v1] = peso; 
     if(g->grafo_vazio == 1){
         g->grafo_vazio = 0; 
     }
