@@ -38,7 +38,7 @@ int num_diferentes(int* vet, int tam){
 }
 
 
-int* determina_vizinhos(Grafo *g, int u, int v, int *return_size){
+int* determina_vizinhos(Grafo *g, int u, int v, int *return_size, int *return_k){
     int nu, nv;
 
     int *adj_u = obtem_lista_vertices_adj(g, u, &nu), 
@@ -53,6 +53,7 @@ int* determina_vizinhos(Grafo *g, int u, int v, int *return_size){
         intersec[i] = -1;
     }
 
+    //determina os vizinhos
     int k = 0;
     for(int i = 0; i < nu; i++){
         for(int j = 0; j< nv; j++){
@@ -64,12 +65,15 @@ int* determina_vizinhos(Grafo *g, int u, int v, int *return_size){
             }
         }
     }
+    
+    //determina o número de vizinhos
+    k = 0;
+    for(int i = 0; i< maxNuNv; i++){
+        if(intersec[i] >= 0) k++;
+    }
 
-    //printf("Resultado Intersecção: \n");
-    //for(int i=0; i< maxNuNv; i++){
-    //    printf("%d\t", intersec[i]);
-    //}
     *return_size = maxNuNv;
+    *return_k = k; 
     return intersec;
 }
 
@@ -136,15 +140,22 @@ int main(int argc, char **argv){
     imprime_grafo(g);
 
     for(int i =0; i< g->tamanho; i++){
+        
+        int modulo_nu, k; 
+        int *nu = obtem_lista_vertices_adj(g, i, &modulo_nu);
+        
         for(int j = 0; j < g->tamanho; j++){
             if(i == j) continue;
-            
             int *intersec; 
             int N_intersec = 0; 
-            printf("%d %d ", i, j);
+            intersec = determina_vizinhos(g, i, j, &N_intersec, &k);
             
-            intersec = determina_vizinhos(g, i, j, &N_intersec);
-            printa_vetor(intersec, N_intersec);
+            if(k <= 0) continue;
+            printf("%d %d %d\n", i, j, k);
+            
+            
+            //printa_vetor(intersec, N_intersec);
+            
         }
     }
 
