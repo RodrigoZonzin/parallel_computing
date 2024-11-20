@@ -38,6 +38,25 @@ int num_diferentes(int* vet, int tam){
 }
 
 
+char* novo_nome_arquivo(char* nome_arquivo){
+    char* ponto = strrchr(nome_arquivo, '.');
+    
+
+    // Criar uma cópia do nome do arquivo até o ponto (sem a extensão)
+    size_t tam = ponto - nome_arquivo;
+    char* novo_nome = (char*)malloc(tam + strlen(".cng") + 1); 
+            
+    //copia nome do arquivo sem extensao
+    strncpy(novo_nome, nome_arquivo, tam);
+    novo_nome[tam] = '\0';  
+    
+    // Adicionar a nova extensão ".cng"
+    strcat(novo_nome, ".cng");
+    
+    return novo_nome;
+}
+
+
 int* determina_vizinhos(Grafo *g, int u, int v, int *return_size, int *return_k){
     int nu, nv;
 
@@ -72,37 +91,21 @@ int* determina_vizinhos(Grafo *g, int u, int v, int *return_size, int *return_k)
         if(intersec[i] >= 0) k++;
     }
 
+    free(adj_u);
+    free(adj_v);
     *return_size = maxNuNv;
     *return_k = k; 
     return intersec;
 }
 
-int mainAntiga(int argc, char **argv){
-
-    char nome_arquivo[100];  
-    int *adj_list; 
-    strcpy(nome_arquivo, argv[1]);
-    Grafo *g = faz_grafo(10);
-
-    int c1, c2; 
-    FILE *f = fopen(nome_arquivo, "r"); 
-
-    while(fscanf(f, "%d %d", &c1, &c2) == 2){
-        insere_aresta(g, c1, c2, 1); 
-    }
-    
-    fclose(f); // Close the file
-    imprime_grafo(g);
-
-    
-    return 0; 
-}
-
 int main(int argc, char **argv){
     char nome_arquivo[100];  
     strcpy(nome_arquivo, argv[1]);
+    char* novo_nome = novo_nome_arquivo(nome_arquivo);
+    
 
     FILE *f = fopen(nome_arquivo, "r"); 
+    FILE *f_saida = fopen(novo_nome_arquivo(nome_arquivo), "w");
 
     //contando quantos elementos estão presentes no arquivo de entrada
     int caractere1, caractere2; 
@@ -122,7 +125,6 @@ int main(int argc, char **argv){
     while(!feof(f)){
         fscanf(f, "%d %d", &caractere1, &caractere2);
         vetor[j] = caractere1; vetor[++j] = caractere2; 
-        printf("%d %d\n", caractere1, caractere2);
         
         j++;
     }
@@ -137,28 +139,26 @@ int main(int argc, char **argv){
         insere_aresta(g, caractere1, caractere2, 1); 
     }
 
-    imprime_grafo(g);
-
     for(int i =0; i< g->tamanho; i++){
-        
-        int modulo_nu, k; 
-        int *nu = obtem_lista_vertices_adj(g, i, &modulo_nu);
+        int k, N_intersec; 
+        int *intersec;
         
         for(int j = 0; j < g->tamanho; j++){
-            if(i == j) continue;
-            int *intersec; 
-            int N_intersec = 0; 
+            //imprime só a matriz triangular inferior
+            if(i >= j) continue;
+
+            //determina_vizinhos() retorna um array de int com os vizinhos
+            //k representa o numero de vizinhos entre os vertices i e j
             intersec = determina_vizinhos(g, i, j, &N_intersec, &k);
             
+            //se o número de vizinhos for inferior a 1, pula
             if(k <= 0) continue;
-            printf("%d %d %d\n", i, j, k);
-            
-            
-            //printa_vetor(intersec, N_intersec);
-            
+
+            fprintf(f_saida, "%d %d %d\n", i, j, k);
         }
     }
 
+    fclose(f_saida);
     fclose(f);
     return 0;
 }
