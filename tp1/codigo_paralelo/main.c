@@ -150,7 +150,10 @@ int main(int argc, char **argv){
         fclose(f);
 
         //send vetor para o codigo obediente
+        MPI_Send(&g->tamanho, 1, MPI_INT, 1, 1, MPI_COMM_WORLD);
+        //sincronizar
         MPI_Send(&g->matriz[0], g->tamanho, MPI_INT, 1, 1, MPI_COMM_WORLD);
+        //MPI_Send(&g->matriz[1], g->tamanho, MPI_INT, 1, 1, MPI_COMM_WORLD);
 
         fclose(f_saida);
     }
@@ -158,28 +161,17 @@ int main(int argc, char **argv){
 
     //codigo obediente
     if(my_rank == 1){
-        //aqui vou receber uma lista 
-        //    0 1 2 3
-        //[0][1 5 8 9]
-        for(int i = 0; i< g->tamanho; i++){
-            int k, N_intersec; 
-            int *intersec;
-            
-            for(int j = 0; j < g->tamanho; j++){
-                //imprime só a matriz triangular inferior
-                if(i >= j) continue;
+        int buf_size; 
+        int *buffer; 
 
-                //determina_vizinhos() retorna um array de int com os vizinhos
-                //k representa o numero de vizinhos entre os vertices i e j
-                intersec = determina_vizinhos(g, i, j, &N_intersec, &k);
-                
-                //se o número de vizinhos for inferior a 1, pula
-                if(k <= 0) continue;
+        MPI_Recv(&buf_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        printf("Tamanho do buffer recebido: %d\n", buf_size);
 
-                fprintf(stdout, "%d %d %d\n", i, j, k);
-            }
-        }
+        //sincronizar 
+        buffer = (int*)malloc(sizeof(int)*buf_size);
+        printa_vetor(buffer, buf_size);
     }
     
     return 0;
 }
+
