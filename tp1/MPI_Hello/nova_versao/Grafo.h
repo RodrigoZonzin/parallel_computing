@@ -9,3 +9,4 @@ typedef struct grafo Grafo;
 
 Grafo* faz_grafo(int);
 void insere_aresta(Grafo*, int, int, int); 
+void imprime_grafo(Grafo*);
