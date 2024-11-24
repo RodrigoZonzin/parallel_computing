@@ -149,7 +149,7 @@ int main(int argc, char **argv){
 
             //determina_vizinhos() retorna um array de int com os vizinhos
             //k representa o numero de vizinhos entre os vertices i e j
-            intersec = determina_vizinhos(g, i, j, &N_intersec, &k);
+            k = determina_vizinhos(g, i, j, &N_intersec, &k);
             
             //se o número de vizinhos for inferior a 1, pula
             if(k <= 0) continue;
