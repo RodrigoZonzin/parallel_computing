@@ -1,57 +1,27 @@
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpi.h>
 
-int main(int argc, char **argv) {
-    int rank, nprocs;
-
+int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+
+    int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    
+    int VAL = 8/size;
 
-    int numero_elementos_por_processo;
-    int *meus_numeros = NULL;
-    int *recvbuffer;
+    int sendbuf[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+    int *recvbuf = (int*)malloc(sizeof(int)*VAL);  // Cada processo recebe 2 elementos
 
-    if (rank == 0) {
-        int total_elementos = atoi(argv[1]);                   // Exemplo: total de elementos
-        int *vetor = (int*)malloc(sizeof(int)*total_elementos);
-        for(int i = 0; i<total_elementos; i++){
-            scanf("%d", &vetor[i]); 
-        }
+    // Distribuir os dados do processo raiz (rank 0)
+    MPI_Scatter(sendbuf, VAL, MPI_INT, recvbuf, VAL, MPI_INT, 0, MPI_COMM_WORLD);
 
-        for(int i = 0; i<total_elementos; i++){
-            printf("%d ", vetor[i]); 
-        }
-
-        numero_elementos_por_processo = total_elementos / nprocs;
-
-        printf("Total de elementos: %d\n Elementos por processo: %d\n",
-               total_elementos, numero_elementos_por_processo);
-    }
-
-    // Compartilhar o número de elementos por processo
-    MPI_Bcast(&numero_elementos_por_processo, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-    // Alocar o buffer de recebimento em cada processo
-    recvbuffer = malloc(numero_elementos_por_processo * sizeof(int));
-
-    // Dispersão dos dados entre os processos
-    MPI_Scatter(meus_numeros, numero_elementos_por_processo, MPI_INT,
-                recvbuffer, numero_elementos_por_processo, MPI_INT, 0, MPI_COMM_WORLD);
-
-    // Cada processo imprime os dados recebidos
-    printf("Rank %d recebeu:", rank);
-    for (int i = 0; i < numero_elementos_por_processo; i++) {
-        printf(" %d", recvbuffer[i]);
+    printf("Processo %d recebeu: ", rank);
+    for(int i =0; i<VAL;i++){
+        printf("%d ", recvbuf[i]);
     }
     printf("\n");
-
-    // Liberar memória
-    if (rank == 0) {
-        free(meus_numeros);
-    }
-    free(recvbuffer);
 
     MPI_Finalize();
     return 0;

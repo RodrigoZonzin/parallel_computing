@@ -1,6 +1,9 @@
 all: 
 	mpicc main.c Grafo.c Grafo.h -o main
 
+teste: 
+	mpicc nMain.c Grafo.c Grafo.h -o main
+
 run:
 	mpirun -np 2 ./main arquivo_teste.txt
 
