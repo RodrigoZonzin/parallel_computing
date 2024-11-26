@@ -58,6 +58,11 @@ int main(int argc, char** argv){
 
     
     int numero_dados_por_processo = (g->tamanho * g->tamanho) / nprocs;
+    //rank 1 vai receber todos os dados em processos desquilibrados
+    if(rank == 1){
+        numero_dados_por_processo += (g->tamanho * g->tamanho % nprocs);         
+    }
+
     int *recvbuf = (int*)malloc(sizeof(int)*numero_dados_por_processo); 
 
     /*
@@ -69,22 +74,28 @@ int main(int argc, char** argv){
     MPI_Scatter(g->matriz, numero_dados_por_processo, MPI_INT, recvbuf, numero_dados_por_processo, MPI_INT, 0, MPI_COMM_WORLD);
 
 
-    printf("In rank %d:\n", rank);
+    /*
+    printf("In rank %d:\n", numero_dados_por_processo);
     for(int i =0; i<numero_dados_por_processo; i++){
         printf("%d ", recvbuf[i]);
     }
     printf("\n");
+    */
 
     if(rank == 0){
+        int *vet_1 = (int*)malloc(sizeof(int)*gtam);
+        int *vet_2 = (int*)malloc(sizeof(int)*gtam);
         printf("Grafo reconstruido:\n");
-        for(int i =0; i < numero_dados_por_processo/g->tamanho;i++){
+        for(int i =0; i < (numero_dados_por_processo/g->tamanho) -1;i++){
             for(int j =0; j< g->tamanho; j++){
-                printf("%d ", recvbuf[i*g->tamanho +j]);
+                vet_1[j] = recvbuf[i*g->tamanho +j];
+            }
+            printf("\t");
+            for(int j =0; j< g->tamanho; j++){
+                vet_2[j] = recvbuf[(i+1)*g->tamanho +j];
             }
             printf("\n");
         }
-        printf("UEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
-        imprime_grafo(g);
     }
 
     MPI_Finalize();
