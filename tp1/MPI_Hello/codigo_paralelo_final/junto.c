@@ -3,24 +3,8 @@
 #include <string.h>
 #include <mpi.h>
 
-struct grafo {
-    int tamanho;
-    int* matriz;  // Matriz de adjacência linearizada
-};
 
-typedef struct grafo Grafo;
 
-Grafo* faz_grafo(int n) {
-    Grafo* g = (Grafo*)malloc(sizeof(Grafo));
-    g->tamanho = n;
-    g->matriz = (int*)calloc(n * n, sizeof(int));
-    return g;
-}
-
-void insere_aresta(Grafo* g, int u, int v, int peso) {
-    g->matriz[u * g->tamanho + v] = peso;
-    g->matriz[v * g->tamanho + u] = peso;
-}
 
 int determina_vizinhos(int* v1, int* v2, int n) {
     int k = 0;
