@@ -58,7 +58,7 @@ void retira_aresta(Grafo* g, int v1, int v2){
 void imprime_grafo(Grafo *g){
     for(int i =0; i< g->tamanho; i++){
         for(int j=0; j< g->tamanho; j++){
-            printf("%d\t", g->matriz[i][j]);
+            printf("%-2d", g->matriz[i][j]);
         }
         printf("\n");
     }
@@ -145,23 +145,3 @@ int* obtem_lista_vertices_adj(Grafo* g, int u, int *tam) {
     *tam = count;
     return adjacentes;
 }
-/*
-int main(){
-
-    Grafo *g = faz_grafo(5); 
-    insere_aresta(g,0,0,10); 
-    insere_aresta(g,4, 3, -2);
-    imprime_grafo(g);
-    printf("listaadjvazia em {v=4}? %d\n", lista_adj_vazia(g, 4));
-    printf("O min eh %d\n", retira_min(g));
-    printf("Existe a aresta {33}? %d\n", existe_aresta(g, 3, 3));
-    printf("Existe a aresta {00}? %d\n", existe_aresta(g, 0, 0));
-    retira_aresta(g, 0, 0); 
-    imprime_grafo(g);
-    printf("listaVazia em {v = 0}? %d\n", lista_adj_vazia(g, 0)); 
-
-    libera_grafo(g);
-
-
-}
-*/
