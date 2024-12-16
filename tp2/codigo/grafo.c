@@ -58,7 +58,7 @@ void retira_aresta(Grafo* g, int v1, int v2){
 void imprime_grafo(Grafo *g){
     for(int i =0; i< g->tamanho; i++){
         for(int j=0; j< g->tamanho; j++){
-            printf("%-2d", g->matriz[i][j]);
+            printf("%d\t", g->matriz[i][j]);
         }
         printf("\n");
     }
