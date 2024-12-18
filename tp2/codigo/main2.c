@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
 #include "grafo.h"
 
 void printa_vetor(int* vet, int tam){
@@ -107,10 +108,10 @@ int main(int argc, char **argv){
         insere_aresta(g, caractere1, caractere2, 1); 
     }
 
-
+    int k;
+    #pragma omp parallel for collapse(2)
     for(int i =0; i< g->tamanho; i++){
-        int k;
-        
+                
         for(int j = 0; j < g->tamanho; j++){
 
             //imprime só a matriz triangular inferior
@@ -121,10 +122,13 @@ int main(int argc, char **argv){
             
             //se o número de vizinhos for inferior a 1, pula
             if(k <= 0) continue;
-
-            fprintf(f_saida, "%d %d %d\n", i, j, k);
+            #pragma omp critical
+            {
+                fprintf(f_saida, "%d %d %d\n", i, j, k);
+            }
         }
     }
+    
 
     fclose(f_saida);
     fclose(f);
