@@ -73,8 +73,6 @@ int main(int argc, char **argv){
     FILE *f = fopen(argv[1], "r"); 
     FILE *f_saida = fopen(novo_nome_arquivo(argv[1]), "w");
 
-    printf("oiiii\n");
-
     //contando quantos elementos estão presentes no arquivo de entrada
     int caractere1, caractere2; 
     int tam = 0; 

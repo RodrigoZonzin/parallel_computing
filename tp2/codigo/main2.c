@@ -4,6 +4,12 @@
 #include <omp.h>
 #include "grafo.h"
 
+typedef struct{
+    int k; 
+    int v;
+    int u; 
+}Tupla;
+
 void printa_vetor(int* vet, int tam){
     for(int i=0; i<tam; i++){
         printf("%d ", vet[i]);
@@ -68,13 +74,21 @@ int determina_vizinhos(Grafo* g, int u, int v){
     return k;
 }
 
+Tupla** cria_vetor_tupla(int n){
+    Tupla** tups = (Tupla**)malloc(sizeof(Tupla)*n);
+
+    for(int i =0; i<n; i++){
+        tups[i] = (Tupla*)malloc(sizeof(Tupla)*n);
+    }
+
+    return tups;
+}
+
 int main(int argc, char **argv){
     char* novo_nome = novo_nome_arquivo(argv[1]);
     
     FILE *f = fopen(argv[1], "r"); 
     FILE *f_saida = fopen(novo_nome_arquivo(argv[1]), "w");
-
-    printf("oiiii\n");
 
     //contando quantos elementos estão presentes no arquivo de entrada
     int caractere1, caractere2; 
@@ -102,16 +116,19 @@ int main(int argc, char **argv){
     free(vetor);
     
     Grafo *g = faz_grafo(n);
+    
 
     rewind(f);
     while(fscanf(f, "%d %d", &caractere1, &caractere2) == 2){
         insere_aresta(g, caractere1, caractere2, 1); 
     }
+    
+    
 
-    int k;
-    #pragma omp parallel for collapse(2)
+    #pragma omp parallel for num_threads(4)
     for(int i =0; i< g->tamanho; i++){
-                
+        int k;
+        Tupla **tups = cria_vetor_tupla(n);
         for(int j = 0; j < g->tamanho; j++){
 
             //imprime só a matriz triangular inferior
@@ -119,15 +136,18 @@ int main(int argc, char **argv){
 
             //determina o modulo do conjunto N(u)(intesec)N(v)
             k = determina_vizinhos(g, i, j);
+            printf("Thread %d processando vertices: %d %d\n", omp_get_thread_num(), i, j);
             
             //se o número de vizinhos for inferior a 1, pula
             if(k <= 0) continue;
-            #pragma omp critical
-            {
-                fprintf(f_saida, "%d %d %d\n", i, j, k);
-            }
+            //#pragma omp critical
+            
+            //fprintf(f_saida, "%d %d %d\n", i, j, k);
+            tups[i][j] = {k, i, j};
+            
         }
     }
+    
     
 
     fclose(f_saida);

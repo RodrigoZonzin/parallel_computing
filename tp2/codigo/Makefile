@@ -5,4 +5,4 @@ seq:
 	gcc -g main.c grafo.c grafo.h -o seq
 
 clean: 
-	rm *.cng main 
+	rm *.cng main seq
