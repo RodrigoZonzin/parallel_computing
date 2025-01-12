@@ -61,7 +61,7 @@ int determina_vizinhos(Grafo* g, int u, int v){
     int k = 0; 
 
     for(int j = 0; j<n; j++){
-        k += g->matriz[u][j] && g->matriz[v][j];
+        k += g->matriz[u*g->tamanho + j] && g->matriz[v*g->tamanho+j];
     }
     
     return k;
@@ -69,6 +69,7 @@ int determina_vizinhos(Grafo* g, int u, int v){
 
 int main(int argc, char **argv){
     char* novo_nome = novo_nome_arquivo(argv[1]);
+    int CONTROLADOR_TAM = atoi(argv[2]);
     
     FILE *f = fopen(argv[1], "r"); 
     FILE *f_saida = fopen(novo_nome_arquivo(argv[1]), "w");
@@ -106,10 +107,10 @@ int main(int argc, char **argv){
     }
 
 
-    for(int i =0; i< g->tamanho; i++){
+    for(int i =0; i< CONTROLADOR_TAM; i++){
         int k;
         
-        for(int j = 0; j < g->tamanho; j++){
+        for(int j = 0; j < CONTROLADOR_TAM; j++){
 
             //imprime só a matriz triangular inferior
             if(i >= j) continue;

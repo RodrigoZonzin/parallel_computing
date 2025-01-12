@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <omp.h>
 #include "grafo.h"
-#include "tupla.h"
 
 void printa_vetor(int* vet, int tam){
     for(int i=0; i<tam; i++){
@@ -58,15 +56,12 @@ char* novo_nome_arquivo(char* nome_arquivo){
     return novo_nome;
 }
 
-double get_time_seconds(struct timeval tv) {
-    return (double)tv.tv_sec + (double)tv.tv_usec / 1e6;
-}
-
 int determina_vizinhos(Grafo* g, int u, int v){
+    int n = g->tamanho;
     int k = 0; 
 
-    for(int j = 0; j<g->tamanho; j++){
-        k += g->matriz[u*g->tamanho+j] && g->matriz[v*g->tamanho+j];
+    for(int j = 0; j<n; j++){
+        k += g->matriz[u*g->tamanho + j] && g->matriz[v*g->tamanho+j];
     }
     
     return k;
@@ -74,7 +69,6 @@ int determina_vizinhos(Grafo* g, int u, int v){
 
 int main(int argc, char **argv){
     char* novo_nome = novo_nome_arquivo(argv[1]);
-    int CONTROLADOR_TAM = atoi(argv[2]);
     
     FILE *f = fopen(argv[1], "r"); 
     FILE *f_saida = fopen(novo_nome_arquivo(argv[1]), "w");
@@ -105,34 +99,30 @@ int main(int argc, char **argv){
     free(vetor);
     
     Grafo *g = faz_grafo(n);
-    
 
     rewind(f);
     while(fscanf(f, "%d %d", &caractere1, &caractere2) == 2){
         insere_aresta(g, caractere1, caractere2, 1); 
     }
-    
-    //g->tamanho = CONTROLADOR_TAM;
-    #pragma omp parallel for 
-    for(int i =0; i< CONTROLADOR_TAM; i++){
+
+
+    for(int i =0; i< g->tamanho; i++){
         int k;
-        for(int j = 0; j < CONTROLADOR_TAM; j++){
+        
+        for(int j = 0; j < g->tamanho; j++){
+
             //imprime só a matriz triangular inferior
             if(i >= j) continue;
 
-            //determina o modulo do conjunto N(i)(intesec)N(j)
+            //determina o modulo do conjunto N(u)(intesec)N(v)
             k = determina_vizinhos(g, i, j);
-            //printf("Thread %d processando vertices: %d %d\n", omp_get_thread_num(), i, j);
-        
+            
             //se o número de vizinhos for inferior a 1, pula
             if(k <= 0) continue;
 
-            #pragma omp critical
             fprintf(f_saida, "%d %d %d\n", i, j, k);
         }
-
     }
-    
 
     fclose(f_saida);
     fclose(f);
